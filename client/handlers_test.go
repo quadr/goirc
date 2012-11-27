@@ -262,7 +262,6 @@ func TestMODE(t *testing.T) {
 		t.Errorf("Channel.ParseModes() not called correctly.")
 	}
 
-
 	// Send a nick mode line, returning Me
 	gomock.InOrder(
 		s.st.EXPECT().GetChannel("test").Return(nil),

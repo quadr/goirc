@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"code.google.com/p/gomock/gomock"
 	"github.com/fluffle/goevent/event"
-	"github.com/fluffle/golog/logging"
 	"github.com/fluffle/goirc/state"
+	"github.com/fluffle/golog/logging"
 	"strings"
 	"testing"
 	"time"
@@ -464,7 +464,7 @@ func TestRateLimit(t *testing.T) {
 
 	// We'll be needing this later...
 	abs := func(i time.Duration) time.Duration {
-		if (i < 0) {
+		if i < 0 {
 			return -i
 		}
 		return i
@@ -484,13 +484,13 @@ func TestRateLimit(t *testing.T) {
 	// characters as the line length means we should be increasing badness by
 	// 2.5 seconds minus the delta between the two ratelimit calls. This should
 	// be minimal but it's guaranteed that it won't be zero. Use 10us as a fuzz.
-	if l := c.rateLimit(60); l != 0 || abs(c.badness - 25*1e8) > 10 * time.Microsecond {
+	if l := c.rateLimit(60); l != 0 || abs(c.badness-25*1e8) > 10*time.Microsecond {
 		t.Errorf("Rate limit calculating badness incorrectly.")
 	}
 	// At this point, we can tip over the badness scale, with a bit of help.
 	// 720 chars => +8 seconds of badness => 10.5 seconds => ratelimit
-	if l := c.rateLimit(720); l != 8 * time.Second ||
-		abs(c.badness - 105*1e8) > 10 * time.Microsecond {
+	if l := c.rateLimit(720); l != 8*time.Second ||
+		abs(c.badness-105*1e8) > 10*time.Microsecond {
 		t.Errorf("Rate limit failed to return correct limiting values.")
 		t.Errorf("l=%d, badness=%d", l, c.badness)
 	}

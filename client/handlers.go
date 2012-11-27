@@ -34,6 +34,7 @@ func NewHandler(f IRCHandler) event.Handler {
 
 // sets up the internal event handlers to do essential IRC protocol things
 var intHandlers map[string]event.Handler
+
 func init() {
 	intHandlers = make(map[string]event.Handler)
 	intHandlers["001"] = NewHandler((*Conn).h_001)
