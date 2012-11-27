@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/fluffle/goevent/event"
+	"github.com/quadr/goevent/event"
 	"github.com/fluffle/goirc/state"
 	"github.com/fluffle/golog/logging"
 	"net"
@@ -197,6 +197,7 @@ func (conn *Conn) postConnect() {
 		// Otherwise the send in shutdown will hang :-/
 		go func() { <-conn.cPing }()
 	}
+	conn.ER.Start()
 	go conn.runLoop()
 }
 
@@ -261,6 +262,7 @@ func (conn *Conn) runLoop() {
 			conn.ED.Dispatch(line.Cmd, conn, line)
 		case <-conn.cLoop:
 			// strobe on control channel, bail out
+			conn.ER.Stop()
 			return
 		}
 	}
