@@ -139,6 +139,18 @@ func (conn *Conn) initialise() {
 	}
 }
 
+// If you want to embed identd in irc client
+// you have to get addr information
+func (conn *Conn) ConnectionInfo() (remote *net.TCPAddr, local *net.TCPAddr, err error) {
+	if !conn.Connected {
+		err = errors.New("Not connect yet.")
+		return
+	}
+	remote = conn.sock.RemoteAddr().(*net.TCPAddr)
+	local = conn.sock.LocalAddr().(*net.TCPAddr)
+	return
+}
+
 // Connect the IRC connection object to "host[:port]" which should be either
 // a hostname or an IP address, with an optional port. To enable explicit SSL
 // on the connection to the IRC server, set Conn.SSL to true before calling
