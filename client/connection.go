@@ -211,6 +211,7 @@ func (conn *Conn) postConnect() {
 	}
 	conn.ER.Start()
 	go conn.runLoop()
+	conn.ED.Dispatch("postConnect", conn, &Line{})
 }
 
 // copied from http.client for great justice
