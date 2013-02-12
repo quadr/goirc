@@ -3,6 +3,8 @@ package client
 import (
 	"strings"
 	"time"
+	"bytes"
+	"unicode/utf8"
 )
 
 // We parse an incoming line into this struct. Line.Cmd is used as the trigger
@@ -25,7 +27,25 @@ func (l *Line) Copy() *Line {
 	return &nl
 }
 
+func replaceRuneError(s string) (str string) {
+	str = s
+	if idx := strings.IndexRune(s, utf8.RuneError); idx != -1 {
+		var buf bytes.Buffer
+		for pos := range s {
+			r, l := utf8.DecodeRuneInString(s[pos:])
+			if r == utf8.RuneError && l == 1 {
+				buf.WriteRune('?')
+			} else {
+				buf.WriteString(s[pos : pos+l])
+			}
+		}
+		str = string(buf.Bytes())
+	}
+	return
+}
+
 func parseLine(s string) *Line {
+	s = replaceRuneError(s)
 	line := &Line{Raw: s}
 	if s[0] == ':' {
 		// remove a source and parse it
