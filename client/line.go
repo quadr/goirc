@@ -4,7 +4,6 @@ import (
 	"strings"
 	"time"
 	"bytes"
-	"unicode/utf8"
 )
 
 // We parse an incoming line into this struct. Line.Cmd is used as the trigger
@@ -33,7 +32,7 @@ func replaceRuneError(s string) string {
 	for _, r := range s {
 		buf.WriteRune(r)
 	}
-	return r.String()
+	return buf.String()
 }
 
 func parseLine(s string) *Line {
