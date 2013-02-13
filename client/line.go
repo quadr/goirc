@@ -27,21 +27,13 @@ func (l *Line) Copy() *Line {
 	return &nl
 }
 
-func replaceRuneError(s string) (str string) {
-	str = s
-	if idx := strings.IndexRune(s, utf8.RuneError); idx != -1 {
-		var buf bytes.Buffer
-		for pos := range s {
-			r, l := utf8.DecodeRuneInString(s[pos:])
-			if r == utf8.RuneError && l == 1 {
-				buf.WriteRune('?')
-			} else {
-				buf.WriteString(s[pos : pos+l])
-			}
-		}
-		str = string(buf.Bytes())
+// Replace Invalid UTF-8 Charactors
+func replaceRuneError(s string) string {
+	var buf bytes.Buffer
+	for _, r := range s {
+		buf.WriteRune(r)
 	}
-	return
+	return r.String()
 }
 
 func parseLine(s string) *Line {
