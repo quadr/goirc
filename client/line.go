@@ -49,7 +49,7 @@ func parseLine(s string) *Line {
 
 		// src can be the hostname of the irc server or a nick!user@host
 		line.Nick = line.Src
-		nidx, uidx := strings.Index(line.Src, "!"), strings.Index(line.Src, "@")
+		nidx, uidx := strings.LastIndex(line.Src, "!"), strings.LastIndex(line.Src, "@")
 		if nidx != -1 {
 			line.Nick = line.Src[:nidx]
 		}
