@@ -284,6 +284,11 @@ func (conn *Conn) runLoop() {
 // Write a \r\n terminated line of output to the connected server,
 // using Hybrid's algorithm to rate limit if conn.Flood is false.
 func (conn *Conn) write(line string) {
+	defer func() {
+		if x := recover(); x != nil {
+			conn.l.Error("WriteError! %s %v", line, x)
+		}
+	}()
 	if !conn.Flood {
 		if t := conn.rateLimit(len(line)); t != 0 {
 			// sleep for the current line's time value before sending it
