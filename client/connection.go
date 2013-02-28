@@ -235,6 +235,10 @@ func (conn *Conn) send() {
 // receive one \r\n terminated line from peer, parse and dispatch it
 func (conn *Conn) recv() {
 	for {
+		if conn.io == nil {
+			conn.l.Error("irc.recv(): Disconnected.")
+			return
+		}
 		s, err := conn.io.ReadString('\n')
 		if err != nil {
 			conn.l.Error("irc.recv(): %s", err.Error())
@@ -284,11 +288,10 @@ func (conn *Conn) runLoop() {
 // Write a \r\n terminated line of output to the connected server,
 // using Hybrid's algorithm to rate limit if conn.Flood is false.
 func (conn *Conn) write(line string) {
-	defer func() {
-		if x := recover(); x != nil {
-			conn.l.Error("WriteError! %s %v", line, x)
-		}
-	}()
+	if conn.io == nil {
+		conn.l.Error("Disconnected! drop Message (%s)", line);
+		return
+	}
 	if !conn.Flood {
 		if t := conn.rateLimit(len(line)); t != 0 {
 			// sleep for the current line's time value before sending it
