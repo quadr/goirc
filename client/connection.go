@@ -186,7 +186,9 @@ func (conn *Conn) Connect(host string, pass ...string) error {
 	}
 	conn.Host = host
 	conn.Connected = true
-	conn.postConnect()
+	if err := conn.postConnect(); err != nil {
+		return err
+	}
 
 	if len(pass) > 0 {
 		conn.Pass(pass[0])
@@ -197,10 +199,14 @@ func (conn *Conn) Connect(host string, pass ...string) error {
 }
 
 // Post-connection setup (for ease of testing)
-func (conn *Conn) postConnect() {
+func (conn *Conn) postConnect() error {
 	conn.io = bufio.NewReadWriter(
 		bufio.NewReader(conn.sock),
 		bufio.NewWriter(conn.sock))
+	if conn.io == nil {
+		conn.l.Error("Allocate io failed!")
+		return errors.New("bufio allocation failed")
+	}
 	go conn.send()
 	go conn.recv()
 	if conn.PingFreq > 0 {
@@ -212,6 +218,7 @@ func (conn *Conn) postConnect() {
 	conn.ER.Start()
 	go conn.runLoop()
 	conn.ED.Dispatch("postConnect", conn, &Line{})
+	return nil
 }
 
 // copied from http.client for great justice
